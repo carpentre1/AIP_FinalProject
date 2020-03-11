@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 2151055066926486604}
   - component: {fileID: 3922694916753885128}
   - component: {fileID: 2190600865266348821}
+  - component: {fileID: 3657322560715831714}
+  - component: {fileID: -5543554831331057911}
   m_Layer: 0
   m_Name: bunny
   m_TagString: Untagged
@@ -59,6 +61,7 @@ SpriteRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -99,6 +102,7 @@ MonoBehaviour:
   walkMultiplier: 1
   waterMultiplier: 0.4
   sprintMultiplier: 2
+  wanderMultiplier: 0.5
   inWater: 0
   environmentalSpeedReduction: 1
   speedModifiers: []
@@ -149,3 +153,33 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &3657322560715831714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4955267469036884024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 502414e421d93a4498758645035b35f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  smellPower: 1
+--- !u!114 &-5543554831331057911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4955267469036884024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5c36ba4ec903344a903ac6e897f088a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scent: 1
+  scentStrength: 1
+  scentRadius: 5
+  defaultScent: 1
+  defaultScentStrength: 1

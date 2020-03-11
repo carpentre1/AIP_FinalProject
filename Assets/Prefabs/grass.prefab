@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2889227535220952200}
   - component: {fileID: 2889227535220952203}
   - component: {fileID: -3774044209312163066}
+  - component: {fileID: 922363064086122653}
   m_Layer: 0
   m_Name: grass
   m_TagString: Untagged
@@ -57,6 +58,7 @@ SpriteRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -106,3 +108,20 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.25, y: 0.25}
   m_EdgeRadius: 0
+--- !u!114 &922363064086122653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2889227535220952202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5c36ba4ec903344a903ac6e897f088a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scent: 3
+  scentStrength: 1
+  scentRadius: 5
+  defaultScent: 3
+  defaultScentStrength: 1

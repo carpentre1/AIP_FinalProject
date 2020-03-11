@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 4638250736418847868}
   - component: {fileID: 4638250736418847869}
   - component: {fileID: 4638250736418847841}
+  - component: {fileID: -3527077073492522763}
+  - component: {fileID: 1827774166531421887}
   m_Layer: 0
   m_Name: fox
   m_TagString: Untagged
@@ -59,6 +61,7 @@ SpriteRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -99,6 +102,7 @@ MonoBehaviour:
   walkMultiplier: 1
   waterMultiplier: 0.4
   sprintMultiplier: 2
+  wanderMultiplier: 0.5
   inWater: 0
   environmentalSpeedReduction: 1
   speedModifiers: []
@@ -149,3 +153,33 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &-3527077073492522763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4638250736418847870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5c36ba4ec903344a903ac6e897f088a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scent: 2
+  scentStrength: 1
+  scentRadius: 5
+  defaultScent: 2
+  defaultScentStrength: 1
+--- !u!114 &1827774166531421887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4638250736418847870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 502414e421d93a4498758645035b35f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  smellPower: 1
