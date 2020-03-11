@@ -121,6 +121,7 @@ public class Scent : MonoBehaviour
 
     /// <summary>
     /// Intermittently announces the scent? Or only when animals move nearby?
+    /// POSSIBLE SOLUTION: keep a list of all scents attached to this tile, only "announce" scents in ontriggerenter
     /// </summary>
     void AnnounceScent()//performed how often? via what?
     {
