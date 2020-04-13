@@ -27,6 +27,10 @@ public class Movement : MonoBehaviour
     bool isPerformingAction = false;
     bool isWandering = false;
 
+    GameObject target;
+    Vector3 directionGoal;
+    Behavior behaviorScript;
+
     // Start is called before the first frame update
     void Start()
     {

@@ -11,16 +11,31 @@ public class FoxBehavior : MonoBehaviour
 
     //States: wandering, chasing prey, moving to water, returning to remembered chicken area
 
+    //higher number objectives are more important
+    public enum Objective { Wander=0, FollowScent=1, StalkPrey=2, ChasePrey=3 }
+    public Objective curObj = Objective.Wander;
+
+    Movement movementScript;
+
+    bool isPredator = false;
+    bool isPrey = false;
+
+
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        movementScript = GetComponent<Movement>();
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    void ChooseObj()
+    {
+
     }
 }

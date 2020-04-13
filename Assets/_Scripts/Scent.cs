@@ -5,13 +5,13 @@ using UnityEngine;
 public class Scent : MonoBehaviour
 {
     //Any object with this script holds a scent that it rubs off onto terrain
-    //Any terrain with a scent will 'announce' that scent to very nearby animals
+    //Animals will periodically 'smell' their surroundings, picking up the strongest nearby scent
     //Animal scents grow in strength over time, and are reduced if the animal goes through water
     //Going through water
     //Scents have a strength and animals have a scent detection level
     //If detection level > strength, the animal detects that scent
 
-    public enum ScentType { Chicken, Bunny, Fox, Foliage}
+    public enum ScentType { Chicken, Bunny, Fox, Foliage, Bush}
     public ScentType scent = ScentType.Foliage;
 
     public float scentStrength = 1f;
@@ -95,7 +95,7 @@ public class Scent : MonoBehaviour
         {
             scent = animalScent.scent;
             scentStrength = animalScent.scentStrength;
-            Debug.Log(this.gameObject + " scent changed to " + animalScent.scent);
+            //Debug.Log(this.gameObject + " scent changed to " + animalScent.scent);
         }
         else
         {
