@@ -35,6 +35,7 @@ public class Movement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        behaviorScript = GetComponent<Behavior>();
     }
 
     // Update is called once per frame
@@ -47,7 +48,7 @@ public class Movement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(isWandering)
+        if(behaviorScript.curObj == Behavior.Objective.Wander)
         {
             //rb.AddForce(wanderDirection * Time.deltaTime * movementSpeed * totalMoveSpeed * wanderMultiplier);
             transform.Translate((wanderDirection * Time.deltaTime * movementSpeed * totalMoveSpeed * wanderMultiplier));

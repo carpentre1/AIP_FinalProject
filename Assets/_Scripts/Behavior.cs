@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class Behavior : MonoBehaviour
 {
@@ -29,13 +30,19 @@ public class Behavior : MonoBehaviour
     SenseHearing hearingScript;
 
     public TextMeshProUGUI behaviorText;
+    public Slider sliderHunger;
+    public Slider sliderThirst;
 
     //1 is full, 0 causes death
     public float hunger = .7f;
     public float thirst = .7f;
+    bool alive = true;
 
     float timeUntilNextThought = 2f;
     bool busyThinking = false;
+
+    List<GameObject> detectedObjects = new List<GameObject>();
+    public GameObject objective;
 
 
 
@@ -51,8 +58,10 @@ public class Behavior : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!alive) return;
         if(!busyThinking)
         {
+            UseAllSenses();
             //try to do each of these things, stopping at the first one that provided a new objective
             CheckForDanger();
             LookForFood();
@@ -60,8 +69,25 @@ public class Behavior : MonoBehaviour
         //if nothing productive to do was found, wander
         if(!busyThinking)
         {
-            UpdateObjective(Objective.Wander);
+            UpdateObjective(Objective.Wander, this.gameObject);
         }
+
+        hunger = Mathf.Max(hunger - .01f * Time.deltaTime, 0);
+        sliderHunger.value = hunger;
+        thirst = Mathf.Max(thirst - .02f * Time.deltaTime, 0);
+        sliderThirst.value = thirst;
+        if(hunger <= 0 || thirst <= 0)
+        {
+            Die(false);
+        }
+    }
+
+    void UseAllSenses()
+    {
+        List<GameObject> seenObjects = sightScript.SeenObjects();
+        detectedObjects = seenObjects;
+
+        //add hearing and smelling to the list of detected objects
     }
 
     IEnumerator ThoughtCoroutine()
@@ -71,18 +97,26 @@ public class Behavior : MonoBehaviour
         busyThinking = false;
     }
 
+    void Die(bool removeCorpse)
+    {
+        alive = false;
+        StopAllCoroutines();
+        behaviorText.text = "RIP";
+        if(removeCorpse)
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
     void CheckForDanger()
     {
         if (busyThinking) return;
 
-        List<GameObject> seenObjects = sightScript.SeenObjects();
-        if (seenObjects.Count == 0) { return; }
-
-        foreach (GameObject g in seenObjects)
+        foreach (GameObject g in detectedObjects)
         {
             if (g.tag == "predator" && isPrey)
             {
-                UpdateObjective(Objective.Escaping);
+                UpdateObjective(Objective.Escaping, g);
                 return;
             }
         }
@@ -92,31 +126,31 @@ public class Behavior : MonoBehaviour
     {
         if (busyThinking) return;
 
-        List<GameObject> seenObjects = sightScript.SeenObjects();
-        if(seenObjects.Count == 0) { return; }
 
-        foreach(GameObject g in seenObjects)
+        foreach(GameObject g in detectedObjects)
         {
             if(g.tag == "bush" && isPrey)
             {
                 //go to bush and eat
-                UpdateObjective(Objective.Eating);
+                UpdateObjective(Objective.Eating, g);
+                objective = g;
                 return;
             }
             else if((g.tag == "bunny" || g.tag == "chicken") && isPredator)
             {
                 //chase/stalk the prey
-                UpdateObjective(Objective.Stalking);
+                UpdateObjective(Objective.Stalking, g);
                 return;
             }
         }
         
     }
 
-    void UpdateObjective(Objective newObj)
+    void UpdateObjective(Objective newObj, GameObject obj)
     {
         Debug.Log(gameObject.name + " new obj: " + newObj.ToString());
         curObj = newObj;
+        objective = obj;
         StartCoroutine(ThoughtCoroutine());
 
         behaviorText.text = curObj.ToString();
