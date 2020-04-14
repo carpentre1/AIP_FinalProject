@@ -64,12 +64,13 @@ public class Behavior : MonoBehaviour
             UseAllSenses();
             //try to do each of these things, stopping at the first one that provided a new objective
             CheckForDanger();
+            LookForWater();
             LookForFood();
         }
         //if nothing productive to do was found, wander
         if(!busyThinking)
         {
-            UpdateObjective(Objective.Wander, this.gameObject);
+            UpdateObjective(Objective.Wander);
         }
 
         hunger = Mathf.Max(hunger - .01f * Time.deltaTime, 0);
@@ -82,12 +83,22 @@ public class Behavior : MonoBehaviour
         }
     }
 
+    public void Nibble()
+    {
+        hunger =  Mathf.Min(hunger + .06f * Time.deltaTime, 1);
+    }
+    public void Drink()
+    {
+        thirst = Mathf.Min(thirst + 1f * Time.deltaTime, 1);
+    }
+
     void UseAllSenses()
     {
         List<GameObject> seenObjects = sightScript.SeenObjects();
         detectedObjects = seenObjects;
 
         //add hearing and smelling to the list of detected objects
+
     }
 
     IEnumerator ThoughtCoroutine()
@@ -126,6 +137,10 @@ public class Behavior : MonoBehaviour
     {
         if (busyThinking) return;
 
+        if(hunger > .7f)
+        {
+            return;
+        }
 
         foreach(GameObject g in detectedObjects)
         {
@@ -146,12 +161,39 @@ public class Behavior : MonoBehaviour
         
     }
 
-    void UpdateObjective(Objective newObj, GameObject obj)
+    void LookForWater()
+    {
+        if (busyThinking) return;
+
+        if(thirst > .7f)
+        {
+            return;
+        }
+
+        foreach(GameObject g in detectedObjects)
+        {
+            if(g.tag == "water")
+            {
+                //go to water and drink
+                UpdateObjective(Objective.Drinking, g);
+                return;
+            }
+        }
+    }
+
+    void UpdateObjective(Objective newObj, GameObject obj=null)
     {
         Debug.Log(gameObject.name + " new obj: " + newObj.ToString());
         curObj = newObj;
         objective = obj;
         StartCoroutine(ThoughtCoroutine());
+
+        //update the list of occupied objects
+        if(GameManager.Instance.occupiedObjects.Contains(objective))
+        {
+            GameManager.Instance.occupiedObjects.Remove(objective);
+        }
+        GameManager.Instance.occupiedObjects.Add(obj);
 
         behaviorText.text = curObj.ToString();
     }

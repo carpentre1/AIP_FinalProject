@@ -27,4 +27,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     public enum AnimalType {None, Bunny, Chicken, Fox};
+
+    //prevent animals from picking/crowding around the same bush or water
+    public List<GameObject> occupiedObjects = new List<GameObject>();
 }

@@ -32,6 +32,10 @@ public class SenseSight : MonoBehaviour
             if (hitColliders[i].gameObject.tag == "bush" || hitColliders[i].gameObject.tag == "predator" || hitColliders[i].gameObject.tag == "water"
                 || hitColliders[i].gameObject.tag == "chicken" || hitColliders[i].gameObject.tag == "bunny")
             {
+                //if (!GameManager.Instance.occupiedObjects.Contains(hitColliders[i].gameObject))
+                //{
+                //    seenObjects.Add(hitColliders[i].gameObject);
+                //}
                 seenObjects.Add(hitColliders[i].gameObject);
             }
             i++;

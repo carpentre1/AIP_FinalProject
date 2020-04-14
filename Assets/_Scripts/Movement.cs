@@ -55,7 +55,45 @@ public class Movement : MonoBehaviour
             wanderTime -= Time.deltaTime;
             if(wanderTime <= 0) { isWandering = false; }
         }
-        if(rb.velocity.magnitude > totalMoveSpeed)
+
+        if(behaviorScript.curObj == Behavior.Objective.Eating)
+        {
+            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .03f)
+            {
+                transform.position = Vector2.MoveTowards(transform.position, behaviorScript.objective.transform.position, totalMoveSpeed * Time.deltaTime);
+            }
+            else
+            {
+                behaviorScript.Nibble();
+            }
+        }
+
+        if (behaviorScript.curObj == Behavior.Objective.Drinking)
+        {
+            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .03f)
+            {
+                transform.position = Vector2.MoveTowards(transform.position, behaviorScript.objective.transform.position, totalMoveSpeed * Time.deltaTime);
+            }
+            else
+            {
+                behaviorScript.Drink();
+            }
+        }
+
+        if(behaviorScript.curObj == Behavior.Objective.Escaping)
+        {
+            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) < 3f)
+            {
+                Vector2 fleeDirection = transform.position - behaviorScript.objective.transform.position;
+                transform.Translate(fleeDirection * Time.deltaTime * totalMoveSpeed);
+            }
+            else
+            {
+                //
+            }
+        }
+
+        if (rb.velocity.magnitude > totalMoveSpeed)
         {
             rb.velocity = rb.velocity.normalized * totalMoveSpeed;
         }
