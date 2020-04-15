@@ -36,7 +36,7 @@ public class Behavior : MonoBehaviour
     //1 is full, 0 causes death
     public float hunger = .7f;
     public float thirst = .7f;
-    bool alive = true;
+    public bool alive = true;
 
     float timeUntilNextThought = 2f;
     bool busyThinking = false;
@@ -106,6 +106,10 @@ public class Behavior : MonoBehaviour
         busyThinking = true;
         yield return new WaitForSeconds(timeUntilNextThought);
         busyThinking = false;
+        if (GameManager.Instance.occupiedObjects.Contains(objective))
+        {
+            GameManager.Instance.occupiedObjects.Remove(objective);
+        }
     }
 
     void Die(bool removeCorpse)
@@ -144,7 +148,7 @@ public class Behavior : MonoBehaviour
 
         foreach(GameObject g in detectedObjects)
         {
-            if(g.tag == "bush" && isPrey)
+            if(g.tag == "bush" && isPrey && !GameManager.Instance.occupiedObjects.Contains(g))
             {
                 //go to bush and eat
                 UpdateObjective(Objective.Eating, g);
@@ -170,14 +174,25 @@ public class Behavior : MonoBehaviour
             return;
         }
 
-        foreach(GameObject g in detectedObjects)
+        GameObject target = null;
+        float shortestDistance = 10;
+
+        foreach (GameObject g in detectedObjects)
         {
-            if(g.tag == "water")
+            if (g.tag == "water" && !GameManager.Instance.occupiedObjects.Contains(g))
             {
-                //go to water and drink
-                UpdateObjective(Objective.Drinking, g);
-                return;
+                float dist = Vector2.Distance(this.gameObject.transform.position, g.transform.position);
+                if (dist < shortestDistance)
+                {
+                    shortestDistance = dist;
+                    target = g;
+                }
             }
+        }
+
+        if(target)
+        {
+            UpdateObjective(Objective.Drinking, target);
         }
     }
 

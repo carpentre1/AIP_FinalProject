@@ -41,6 +41,10 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(!behaviorScript.alive)
+        {
+            return;
+        }
         CalculateSpeed();
         WanderRandomly();
         InputMove();
@@ -80,7 +84,19 @@ public class Movement : MonoBehaviour
             }
         }
 
-        if(behaviorScript.curObj == Behavior.Objective.Escaping)
+        if (behaviorScript.curObj == Behavior.Objective.Stalking)
+        {
+            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .8f)
+            {
+                transform.position = Vector2.MoveTowards(transform.position, behaviorScript.objective.transform.position, totalMoveSpeed * Time.deltaTime);
+            }
+            else
+            {
+                behaviorScript.Nibble();
+            }
+        }
+
+        if (behaviorScript.curObj == Behavior.Objective.Escaping)
         {
             if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) < 3f)
             {
