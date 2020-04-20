@@ -16,6 +16,9 @@ public class Scent : MonoBehaviour
 
     public float scentStrength = 1f;
     public float scentRadius = 5;
+    const float maxScentStrength = 4f;
+
+    float decayRate = .1f;
 
     public ScentType defaultScent = ScentType.Foliage;
     public float defaultScentStrength = 1f;
@@ -24,17 +27,100 @@ public class Scent : MonoBehaviour
     bool decayCycleBusy = false;
     float announceWaitTime = 2f;
     bool announceCycleBusy = false;
+
+    public bool isTurf = false;
+    public GameObject northNeighbor;
+    public GameObject southNeighbor;
+    public GameObject eastNeighbor;
+    public GameObject westNeighbor;
+    public List<GameObject> neighbors = new List<GameObject>();
+
+    public GameObject scentTracker;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        EstablishAllNeighbors();
     }
 
     // Update is called once per frame
     void Update()
     {
         DecayScent();
-        //AnnounceScent();
+    }
+
+    GameObject StrongestNeighbor()//find a nearby tile with a stronger scent than this one
+    {
+        float strongestScent = scentStrength;
+        GameObject strongestScentObject = null;
+
+        foreach(GameObject g in neighbors)
+        {
+            Scent neighborScent = g.GetComponent<Scent>();
+            if(neighborScent.scent == scent)//we're looking for the same type of scent only
+            {
+                if(neighborScent.scentStrength > strongestScent)
+                {
+                    strongestScent = neighborScent.scentStrength;
+                    strongestScentObject = g;
+                }
+            }
+        }
+        return strongestScentObject;
+    }
+
+    void EstablishAllNeighbors()
+    {
+        northNeighbor = EstablishNeighbor(0, .25f);//.25 is one grid block
+        southNeighbor = EstablishNeighbor(0, -.25f);
+        eastNeighbor = EstablishNeighbor(.25f, 0);
+        westNeighbor = EstablishNeighbor(-.25f, 0);
+
+        neighbors.Add(northNeighbor);
+        neighbors.Add(eastNeighbor);
+        neighbors.Add(southNeighbor);
+        neighbors.Add(westNeighbor);
+    }
+
+    GameObject EstablishNeighbor(float offsetX, float offsetY)
+    {
+        Vector3 neighborPos = new Vector3(gameObject.transform.position.x + offsetX, gameObject.transform.position.y + offsetY);
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(neighborPos, .01f);
+        foreach(Collider2D col in hitColliders)
+        {
+            if(col.gameObject.GetComponent<Scent>())
+            {
+                if(col.gameObject.GetComponent<Scent>().isTurf)
+                {
+                    return col.gameObject;
+                }
+            }
+        }
+        return null;
+    }
+
+    void DebugUpdateScentTracker()
+    {
+        if(scent == ScentType.Bush || scent == ScentType.Foliage)
+        {
+            scentTracker.transform.localScale = new Vector3(0, 0, 0);
+            return;//don't show scent tracker for default grass scents
+        }
+
+        SpriteRenderer sprite = scentTracker.GetComponent<SpriteRenderer>();
+        if(scent == ScentType.Bunny || scent == ScentType.Chicken)
+        {
+            sprite.color = Color.yellow;
+        }
+        if(scent == ScentType.Fox)
+        {
+            sprite.color = Color.red;
+        }
+        if(scent == ScentType.Foliage || scent == ScentType.Bush)
+        {
+            sprite.color = Color.green;
+        }
+        scentTracker.transform.localScale = new Vector3(scentStrength / 5f, scentStrength / 5f, scentStrength / 5f);
     }
 
     /// <summary>
@@ -49,7 +135,7 @@ public class Scent : MonoBehaviour
         StartCoroutine(DecayCycleCoroutine());
         if (scent != defaultScent)
         {
-            scentStrength -= .1f;
+            scentStrength -= decayRate;
             if(scentStrength < defaultScentStrength)//if it falls below the minimum value...
             {
                 //revert the scent back to its default scent type
@@ -58,20 +144,21 @@ public class Scent : MonoBehaviour
         }
         else if(scent == defaultScent)
         {
-            if(scent == ScentType.Foliage)
+            if(scent == ScentType.Foliage || scent == ScentType.Bush)
             {
                 //
             }
             //scent slowly builds up or down to a normalized value
-            else if(scentStrength < defaultScentStrength+5)
+            else if(scentStrength < maxScentStrength)
             {
                 scentStrength += .1f;
             }
-            else if (scentStrength > defaultScentStrength+5)
+            else if (scentStrength > maxScentStrength)
             {
                 scentStrength -= .1f;
             }
         }
+        if(isTurf) DebugUpdateScentTracker();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -84,6 +171,11 @@ public class Scent : MonoBehaviour
                 AddScent(animalScent);
             }
         }
+        if(other.GetComponent<SenseSmell>() && isTurf)
+        {
+            SenseSmell smell = other.GetComponent<SenseSmell>();
+            smell.ReceiveScent(this);
+        }
     }
     /// <summary>
     /// Adds a scent to the object or increases that scent's potency
@@ -91,6 +183,10 @@ public class Scent : MonoBehaviour
     /// </summary>
     public void AddScent(Scent animalScent)
     {
+        if(GetComponent<Behavior>())
+        {
+            return;
+        }
         if(scent != animalScent.scent)
         {
             scent = animalScent.scent;
@@ -144,7 +240,7 @@ public class Scent : MonoBehaviour
         foreach(GameObject g in animalsInRadius)
         {
             SenseSmell smell = g.GetComponent<SenseSmell>();
-            smell.ReceiveScent(this, scentStrength);
+            smell.ReceiveScent(this);
         }
     }
 }

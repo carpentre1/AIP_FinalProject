@@ -188,6 +188,13 @@ MonoBehaviour:
   scentRadius: 5
   defaultScent: 1
   defaultScentStrength: 1
+  isTurf: 0
+  northNeighbor: {fileID: 0}
+  southNeighbor: {fileID: 0}
+  eastNeighbor: {fileID: 0}
+  westNeighbor: {fileID: 0}
+  neighbors: []
+  scentTracker: {fileID: 0}
 --- !u!114 &-4267331273003799209
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -232,8 +239,9 @@ MonoBehaviour:
   behaviorText: {fileID: 605780541631933101}
   sliderHunger: {fileID: 5017535349606529637}
   sliderThirst: {fileID: 374353590820600699}
-  hunger: 0.7
-  thirst: 0.7
+  hunger: 1
+  thirst: 1
+  alive: 1
   objective: {fileID: 0}
 --- !u!1001 &3007718404622764941
 PrefabInstance:

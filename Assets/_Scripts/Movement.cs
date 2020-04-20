@@ -43,6 +43,7 @@ public class Movement : MonoBehaviour
     {
         if(!behaviorScript.alive)
         {
+            GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
             return;
         }
         CalculateSpeed();
@@ -52,7 +53,11 @@ public class Movement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(behaviorScript.curObj == Behavior.Objective.Wander)
+        if (!behaviorScript.alive)
+        {
+            return;
+        }
+        if (behaviorScript.curObj == Behavior.Objective.Wander)
         {
             //rb.AddForce(wanderDirection * Time.deltaTime * movementSpeed * totalMoveSpeed * wanderMultiplier);
             transform.Translate((wanderDirection * Time.deltaTime * movementSpeed * totalMoveSpeed * wanderMultiplier));
@@ -62,7 +67,7 @@ public class Movement : MonoBehaviour
 
         if(behaviorScript.curObj == Behavior.Objective.Eating)
         {
-            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .03f)
+            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .04f)
             {
                 transform.position = Vector2.MoveTowards(transform.position, behaviorScript.objective.transform.position, totalMoveSpeed * Time.deltaTime);
             }
@@ -74,7 +79,7 @@ public class Movement : MonoBehaviour
 
         if (behaviorScript.curObj == Behavior.Objective.Drinking)
         {
-            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .03f)
+            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .04f)
             {
                 transform.position = Vector2.MoveTowards(transform.position, behaviorScript.objective.transform.position, totalMoveSpeed * Time.deltaTime);
             }

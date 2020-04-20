@@ -5,11 +5,12 @@ using UnityEngine;
 public class SenseSmell : MonoBehaviour
 {
     public float smellPower = 1f;//how effective the creature is at picking up subtle smells
+    Behavior myBehavior;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        myBehavior = GetComponent<Behavior>();
     }
 
     // Update is called once per frame
@@ -18,21 +19,29 @@ public class SenseSmell : MonoBehaviour
         
     }
 
-    public void ReceiveScent(Scent scent, float intensity)
+    public void ReceiveScent(Scent scent)
     {
-        if(intensity < smellPower)
+        if(scent.scentStrength < smellPower)
         {
             return;//couldn't smell it!
         }
         else
         {
-            Debug.Log(this.gameObject + " smelled " + scent.gameObject);
+            Debug.Log(gameObject.name + " smelled " + scent.gameObject.name + "'s " + scent.scent.ToString() + " scent.");
+            DetermineScentResponse(scent);
         }
     }
 
-    void DetermineScentResponse(Scent scent, float intensity)
+    void DetermineScentResponse(Scent scent)
     {
-        //list of smells?
-        //if following a good scent, go towards strongest smell or start with weakest?
+        if(scent.gameObject.GetComponent<Behavior>())
+        {
+            Behavior behavior = scent.gameObject.GetComponent<Behavior>();
+        }
+        if(scent.scent == Scent.ScentType.Fox && myBehavior.isPrey)
+        {
+            myBehavior.UpdateObjective(Behavior.Objective.Escaping, scent.gameObject);
+            Debug.Log("fleeing due to smell");
+        }
     }
 }

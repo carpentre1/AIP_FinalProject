@@ -53,6 +53,9 @@ public class Behavior : MonoBehaviour
         smellScript = GetComponent<SenseSmell>();
         sightScript = GetComponent<SenseSight>();
         hearingScript = GetComponent<SenseHearing>();
+
+        hunger = Random.Range(.7f, 1f);
+        thirst = Random.Range(.7f, 1f);
     }
 
     // Update is called once per frame
@@ -66,6 +69,8 @@ public class Behavior : MonoBehaviour
             CheckForDanger();
             LookForWater();
             LookForFood();
+
+            TrackScent();
         }
         //if nothing productive to do was found, wander
         if(!busyThinking)
@@ -90,6 +95,11 @@ public class Behavior : MonoBehaviour
     public void Drink()
     {
         thirst = Mathf.Min(thirst + 1f * Time.deltaTime, 1);
+    }
+
+    void TrackScent()
+    {
+
     }
 
     void UseAllSenses()
@@ -196,7 +206,7 @@ public class Behavior : MonoBehaviour
         }
     }
 
-    void UpdateObjective(Objective newObj, GameObject obj=null)
+    public void UpdateObjective(Objective newObj, GameObject obj=null)
     {
         Debug.Log(gameObject.name + " new obj: " + newObj.ToString());
         curObj = newObj;
