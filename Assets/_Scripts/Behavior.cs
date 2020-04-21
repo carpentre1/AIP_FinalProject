@@ -38,8 +38,11 @@ public class Behavior : MonoBehaviour
     public float thirst = .7f;
     public bool alive = true;
 
+    //how much food an object has on it
+    float foodValue = 1;
+
     float timeUntilNextThought = 2f;
-    bool busyThinking = false;
+    public bool busyThinking = false;
 
     List<GameObject> detectedObjects = new List<GameObject>();
     public GameObject objective;
@@ -56,6 +59,10 @@ public class Behavior : MonoBehaviour
 
         hunger = Random.Range(.7f, 1f);
         thirst = Random.Range(.7f, 1f);
+        if(isPredator)
+        {
+            hunger = .5f;
+        }
     }
 
     // Update is called once per frame
@@ -88,9 +95,22 @@ public class Behavior : MonoBehaviour
         }
     }
 
-    public void Nibble()
+    public void Nibble(GameObject g)
     {
-        hunger =  Mathf.Min(hunger + .06f * Time.deltaTime, 1);
+        if (g.GetComponent<Behavior>())
+        {
+            Behavior behavior = g.GetComponent<Behavior>();
+            behavior.foodValue -= .01f;
+            hunger = Mathf.Min(hunger + .16f * Time.deltaTime, 1);
+            if (behavior.foodValue <= 0)
+            {
+                behavior.Die(true);
+            }
+        }
+        else
+        {
+            hunger = Mathf.Min(hunger + .08f * Time.deltaTime, 1);
+        }
     }
     public void Drink()
     {
@@ -122,7 +142,7 @@ public class Behavior : MonoBehaviour
         }
     }
 
-    void Die(bool removeCorpse)
+    public void Die(bool removeCorpse)
     {
         alive = false;
         StopAllCoroutines();
@@ -167,8 +187,15 @@ public class Behavior : MonoBehaviour
             }
             else if((g.tag == "bunny" || g.tag == "chicken") && isPredator)
             {
-                //chase/stalk the prey
-                UpdateObjective(Objective.Stalking, g);
+                if(g.GetComponent<Behavior>().alive)
+                {
+                    //chase/stalk the prey
+                    UpdateObjective(Objective.Stalking, g);
+                }
+                else
+                {
+                    UpdateObjective(Objective.Eating, g);
+                }
                 return;
             }
         }

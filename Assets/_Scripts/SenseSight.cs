@@ -5,7 +5,7 @@ using UnityEngine;
 public class SenseSight : MonoBehaviour
 {
 
-    float sightRadius = 2.0f;//how far the animal can see in a circle around it
+    public float sightRadius = 2.0f;//how far the animal can see in a circle around it
     public float distractedModifier = .7f;//how much sight is reduced when distracted (eating, drinking)
     float currentDistractionModifier = 1f;
 

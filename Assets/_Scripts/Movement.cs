@@ -15,6 +15,8 @@ public class Movement : MonoBehaviour
     public int inWater = 0;//any value over 0 is in water
     float totalMoveSpeed = 1.0f;
 
+    public float eatRange = .04f;
+
     const float MOVEMENT_NORMALIZATION = 1f;//adjusts the overall speed of movement to accomodate the size of objects relative to the world
 
     bool isPlayerControlled = false;
@@ -65,15 +67,15 @@ public class Movement : MonoBehaviour
             if(wanderTime <= 0) { isWandering = false; }
         }
 
-        if(behaviorScript.curObj == Behavior.Objective.Eating)
+        if(behaviorScript.curObj == Behavior.Objective.Eating && behaviorScript.objective)
         {
-            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .04f)
+            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > eatRange)
             {
                 transform.position = Vector2.MoveTowards(transform.position, behaviorScript.objective.transform.position, totalMoveSpeed * Time.deltaTime);
             }
             else
             {
-                behaviorScript.Nibble();
+                behaviorScript.Nibble(behaviorScript.objective);
             }
         }
 
@@ -91,13 +93,14 @@ public class Movement : MonoBehaviour
 
         if (behaviorScript.curObj == Behavior.Objective.Stalking)
         {
-            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .8f)
+            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .6f)
             {
                 transform.position = Vector2.MoveTowards(transform.position, behaviorScript.objective.transform.position, totalMoveSpeed * Time.deltaTime);
             }
             else
             {
-                behaviorScript.Nibble();
+                behaviorScript.objective.GetComponent<Behavior>().Die(false);
+                behaviorScript.UpdateObjective(Behavior.Objective.Eating, behaviorScript.objective);
             }
         }
 
