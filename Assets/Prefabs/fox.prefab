@@ -109,6 +109,8 @@ MonoBehaviour:
   sprintMultiplier: 2
   wanderMultiplier: 0.5
   inWater: 0
+  eatRange: 0.6
+  drinkRange: 0.12
   environmentalSpeedReduction: 1
   speedModifiers: []
 --- !u!61 &4638250736418847869
@@ -135,7 +137,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.48, y: 0.24}
+  m_Size: {x: 0.4, y: 0.24}
   m_EdgeRadius: 0
 --- !u!50 &4638250736418847841
 Rigidbody2D:
@@ -207,6 +209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aff460f24747e3841aef4ebbc14fc8a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sightRadius: 2
   distractedModifier: 0.7
 --- !u!114 &2077646659644324351
 MonoBehaviour:
@@ -242,7 +245,9 @@ MonoBehaviour:
   hunger: 1
   thirst: 1
   alive: 1
+  busyThinking: 0
   objective: {fileID: 0}
+  farBoundary: {fileID: 0}
 --- !u!1001 &4997894860170475006
 PrefabInstance:
   m_ObjectHideFlags: 0

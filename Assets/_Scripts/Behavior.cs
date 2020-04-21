@@ -14,7 +14,7 @@ public class Behavior : MonoBehaviour
     //States: wandering, chasing prey, moving to water, returning to remembered chicken area
 
     //higher number objectives are more important
-    public enum Objective { Wander = 0, FollowingScent = 1, Stalking = 2, Chasing = 3, Eating = 4, Drinking = 5, Escaping = 6 }
+    public enum Objective { Wander = 0, FollowingScent = 1, Stalking = 2, Chasing = 3, Eating = 4, Drinking = 5, Escaping = 6, SearchingFar = 7 }
     public Objective curObj = Objective.Wander;
 
     public enum Animal { Chicken, Fox, Bunny}
@@ -41,11 +41,13 @@ public class Behavior : MonoBehaviour
     //how much food an object has on it
     float foodValue = 1;
 
-    float timeUntilNextThought = 2f;
+    const float DEFAULT_TIME_UNTIL_NEXT_THOUGHT = 1f;
+    float timeUntilNextThought = 1f;
     public bool busyThinking = false;
 
     List<GameObject> detectedObjects = new List<GameObject>();
     public GameObject objective;
+    public GameObject farBoundary;
 
 
 
@@ -61,7 +63,8 @@ public class Behavior : MonoBehaviour
         thirst = Random.Range(.7f, 1f);
         if(isPredator)
         {
-            hunger = .5f;
+            hunger = .4f;
+            thirst = .4f;
         }
     }
 
@@ -73,9 +76,12 @@ public class Behavior : MonoBehaviour
         {
             UseAllSenses();
             //try to do each of these things, stopping at the first one that provided a new objective
+
             CheckForDanger();
             LookForWater();
             LookForFood();
+
+            SearchFar();
 
             TrackScent();
         }
@@ -97,6 +103,7 @@ public class Behavior : MonoBehaviour
 
     public void Nibble(GameObject g)
     {
+        timeUntilNextThought += Time.deltaTime;
         if (g.GetComponent<Behavior>())
         {
             Behavior behavior = g.GetComponent<Behavior>();
@@ -111,10 +118,81 @@ public class Behavior : MonoBehaviour
         {
             hunger = Mathf.Min(hunger + .08f * Time.deltaTime, 1);
         }
+
+        if(hunger >= .95f)
+        {
+            UpdateObjective(Objective.Wander);
+        }
     }
     public void Drink()
     {
+        timeUntilNextThought += Time.deltaTime;
         thirst = Mathf.Min(thirst + 1f * Time.deltaTime, 1);
+
+        if (thirst >= .95f)
+        {
+            UpdateObjective(Objective.Wander);
+        }
+    }
+
+    void SearchFar()
+    {
+        if(busyThinking)
+        {
+            return;
+        }
+        if(hunger > .4f && thirst > .4f)//only search far when desperate
+        {
+            return;
+        }
+
+        Debug.Log("searching far");
+        if(!farBoundary)
+        {
+            UpdateObjective(Objective.SearchingFar, FurthestObject());
+        }
+        else//if we've already established a far boundary, just go to that. reset the far boundary when we reach it in Movement.cs
+        {
+            UpdateObjective(Objective.SearchingFar, farBoundary);
+        }
+    }
+
+    GameObject FurthestObject()
+    {
+        //search in all 4 directions, go in the direction that's furthest away
+        List<GameObject> raycastObjects = new List<GameObject>();
+        raycastObjects.Add(RaycastObjectHit(Vector2.up));
+        raycastObjects.Add(RaycastObjectHit(Vector2.down));
+        raycastObjects.Add(RaycastObjectHit(Vector2.left));
+        raycastObjects.Add(RaycastObjectHit(Vector2.right));
+
+        float furthestDist = 0;
+        GameObject furthestObj = null;
+
+        foreach (GameObject g in raycastObjects)
+        {
+            float dist = Vector2.Distance(this.gameObject.transform.position, g.transform.position);
+            Debug.Log(g.name + " dist: " + dist);
+            if (dist > furthestDist)
+            {
+                furthestDist = dist;
+                furthestObj = g;
+            }
+        }
+        farBoundary = furthestObj;
+        return furthestObj;
+    }
+
+    GameObject RaycastObjectHit(Vector2 dir)
+    {
+        int layerMask = LayerMask.GetMask("boundary");
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, Mathf.Infinity, layerMask);
+        Ray dirRay = new Ray(transform.position, dir);
+        if(hit.collider != null)
+        {
+            return hit.collider.gameObject;
+        }
+        return null;
     }
 
     void TrackScent()
@@ -134,8 +212,10 @@ public class Behavior : MonoBehaviour
     IEnumerator ThoughtCoroutine()
     {
         busyThinking = true;
+        timeUntilNextThought = DEFAULT_TIME_UNTIL_NEXT_THOUGHT;
         yield return new WaitForSeconds(timeUntilNextThought);
         busyThinking = false;
+        Debug.Log(this.gameObject.name + " finished thinking");
         if (GameManager.Instance.occupiedObjects.Contains(objective))
         {
             GameManager.Instance.occupiedObjects.Remove(objective);
@@ -235,9 +315,9 @@ public class Behavior : MonoBehaviour
 
     public void UpdateObjective(Objective newObj, GameObject obj=null)
     {
-        Debug.Log(gameObject.name + " new obj: " + newObj.ToString());
         curObj = newObj;
         objective = obj;
+        StopAllCoroutines();
         StartCoroutine(ThoughtCoroutine());
 
         //update the list of occupied objects

@@ -109,6 +109,8 @@ MonoBehaviour:
   sprintMultiplier: 2
   wanderMultiplier: 0.5
   inWater: 0
+  eatRange: 0.04
+  drinkRange: 0.07
   environmentalSpeedReduction: 1
   speedModifiers: []
 --- !u!61 &3922694916753885128
@@ -219,6 +221,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aff460f24747e3841aef4ebbc14fc8a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sightRadius: 2
   distractedModifier: 0.7
 --- !u!114 &7947011282982717872
 MonoBehaviour:
@@ -242,7 +245,9 @@ MonoBehaviour:
   hunger: 1
   thirst: 1
   alive: 1
+  busyThinking: 0
   objective: {fileID: 0}
+  farBoundary: {fileID: 0}
 --- !u!1001 &3007718404622764941
 PrefabInstance:
   m_ObjectHideFlags: 0

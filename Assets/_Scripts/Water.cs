@@ -24,7 +24,6 @@ public class Water : MonoBehaviour
         }
         if(other.GetComponent<Scent>())
         {
-            Debug.Log(other.gameObject.name + " water: " + other.GetComponent<Scent>().scentStrength + " becomes " + other.GetComponent<Scent>().defaultScentStrength);
             other.GetComponent<Scent>().scentStrength = other.GetComponent<Scent>().defaultScentStrength;
         }
     }

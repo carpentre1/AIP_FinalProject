@@ -27,7 +27,6 @@ public class SenseSmell : MonoBehaviour
         }
         else
         {
-            Debug.Log(gameObject.name + " smelled " + scent.gameObject.name + "'s " + scent.scent.ToString() + " scent.");
             DetermineScentResponse(scent);
         }
     }

@@ -16,6 +16,7 @@ public class Movement : MonoBehaviour
     float totalMoveSpeed = 1.0f;
 
     public float eatRange = .04f;
+    public float drinkRange = .05f;
 
     const float MOVEMENT_NORMALIZATION = 1f;//adjusts the overall speed of movement to accomodate the size of objects relative to the world
 
@@ -79,9 +80,21 @@ public class Movement : MonoBehaviour
             }
         }
 
+        if (behaviorScript.curObj == Behavior.Objective.SearchingFar && behaviorScript.objective)
+        {
+            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > 1)
+            {
+                transform.position = Vector2.MoveTowards(transform.position, behaviorScript.objective.transform.position, totalMoveSpeed * Time.deltaTime);
+            }
+            else
+            {
+                behaviorScript.farBoundary = null;
+            }
+        }
+
         if (behaviorScript.curObj == Behavior.Objective.Drinking)
         {
-            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .04f)
+            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > drinkRange)
             {
                 transform.position = Vector2.MoveTowards(transform.position, behaviorScript.objective.transform.position, totalMoveSpeed * Time.deltaTime);
             }
