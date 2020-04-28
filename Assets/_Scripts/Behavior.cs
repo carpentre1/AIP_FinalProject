@@ -14,7 +14,7 @@ public class Behavior : MonoBehaviour
     //States: wandering, chasing prey, moving to water, returning to remembered chicken area
 
     //higher number objectives are more important
-    public enum Objective { Wander = 0, FollowingScent = 1, Stalking = 2, Chasing = 3, Eating = 4, Drinking = 5, Escaping = 6, SearchingFar = 7 }
+    public enum Objective { Wander = 0, FollowingScent = 1, Stalking = 2, Chasing = 3, Eating = 4, Drinking = 5, Escaping = 6, SearchingFar = 7, Tracking=8 }
     public Objective curObj = Objective.Wander;
 
     public enum Animal { Chicken, Fox, Bunny}
@@ -45,9 +45,11 @@ public class Behavior : MonoBehaviour
     float timeUntilNextThought = 1f;
     public bool busyThinking = false;
 
-    List<GameObject> detectedObjects = new List<GameObject>();
+    [HideInInspector]
+    public List<GameObject> detectedObjects = new List<GameObject>();
     public GameObject objective;
     public GameObject farBoundary;
+    public List<GameObject> smelledObjects = new List<GameObject>();
 
 
 
@@ -64,7 +66,6 @@ public class Behavior : MonoBehaviour
         if(isPredator)
         {
             hunger = .4f;
-            thirst = .4f;
         }
     }
 
@@ -82,8 +83,6 @@ public class Behavior : MonoBehaviour
             LookForFood();
 
             SearchFar();
-
-            TrackScent();
         }
         //if nothing productive to do was found, wander
         if(!busyThinking)
@@ -146,7 +145,6 @@ public class Behavior : MonoBehaviour
             return;
         }
 
-        Debug.Log("searching far");
         if(!farBoundary)
         {
             UpdateObjective(Objective.SearchingFar, FurthestObject());
@@ -172,7 +170,7 @@ public class Behavior : MonoBehaviour
         foreach (GameObject g in raycastObjects)
         {
             float dist = Vector2.Distance(this.gameObject.transform.position, g.transform.position);
-            Debug.Log(g.name + " dist: " + dist);
+            //Debug.Log(g.name + " dist: " + dist);
             if (dist > furthestDist)
             {
                 furthestDist = dist;
@@ -195,11 +193,6 @@ public class Behavior : MonoBehaviour
         return null;
     }
 
-    void TrackScent()
-    {
-
-    }
-
     void UseAllSenses()
     {
         List<GameObject> seenObjects = sightScript.SeenObjects();
@@ -215,7 +208,6 @@ public class Behavior : MonoBehaviour
         timeUntilNextThought = DEFAULT_TIME_UNTIL_NEXT_THOUGHT;
         yield return new WaitForSeconds(timeUntilNextThought);
         busyThinking = false;
-        Debug.Log(this.gameObject.name + " finished thinking");
         if (GameManager.Instance.occupiedObjects.Contains(objective))
         {
             GameManager.Instance.occupiedObjects.Remove(objective);
@@ -279,7 +271,17 @@ public class Behavior : MonoBehaviour
                 return;
             }
         }
-        
+        foreach(GameObject g in smelledObjects)
+        {
+            Scent scent = g.GetComponent<Scent>();
+            if(!scent.scentProvider) { continue; }
+            if(scent.scentStrength < 1) { continue; }
+            if((scent.scentProvider.tag == "chicken" || scent.scentProvider.tag == "bunny") && isPredator)
+            {
+                Debug.Log("found a scent to track");
+                UpdateObjective(Objective.Tracking, g);
+            }
+        }
     }
 
     void LookForWater()

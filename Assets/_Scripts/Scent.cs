@@ -17,13 +17,14 @@ public class Scent : MonoBehaviour
     public float scentStrength = 1f;
     public float scentRadius = 5;
     const float maxScentStrength = 4f;
+    public GameObject scentProvider;//the thing that put this scent here
 
-    float decayRate = .1f;
+    float decayRate = .02f;//default rate is .1
 
     public ScentType defaultScent = ScentType.Foliage;
     public float defaultScentStrength = 1f;
 
-    float decayWaitTime = 1f;
+    float decayWaitTime = .2f;//default wait time is 1
     bool decayCycleBusy = false;
     float announceWaitTime = 2f;
     bool announceCycleBusy = false;
@@ -49,13 +50,15 @@ public class Scent : MonoBehaviour
         DecayScent();
     }
 
-    GameObject StrongestNeighbor()//find a nearby tile with a stronger scent than this one
+    public GameObject StrongestNeighbor()//find a nearby tile with a stronger scent than this one
     {
         float strongestScent = scentStrength;
         GameObject strongestScentObject = null;
 
         foreach(GameObject g in neighbors)
         {
+            if(!g) { continue; }
+            if (!g.GetComponent<Scent>()) { continue; }
             Scent neighborScent = g.GetComponent<Scent>();
             if(neighborScent.scent == scent)//we're looking for the same type of scent only
             {
@@ -88,13 +91,15 @@ public class Scent : MonoBehaviour
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(neighborPos, .01f);
         foreach(Collider2D col in hitColliders)
         {
-            if(col.gameObject.GetComponent<Scent>())
+            if (col.gameObject.GetComponent<Scent>())
             {
-                if(col.gameObject.GetComponent<Scent>().isTurf)
+                if (col.gameObject.GetComponent<Scent>().isTurf)
                 {
                     return col.gameObject;
                 }
+                else continue;
             }
+            else continue;
         }
         return null;
     }
@@ -177,6 +182,14 @@ public class Scent : MonoBehaviour
             smell.ReceiveScent(this);
         }
     }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if(collision.GetComponent<SenseSmell>())
+        {
+            collision.GetComponent<SenseSmell>().ForgetSmell(this);
+        }
+    }
     /// <summary>
     /// Adds a scent to the object or increases that scent's potency
     /// Occurs each time an animal moves onto or performs an action on that object
@@ -190,6 +203,7 @@ public class Scent : MonoBehaviour
         if(scent != animalScent.scent)
         {
             scent = animalScent.scent;
+            scentProvider = animalScent.gameObject;
             scentStrength = animalScent.scentStrength;
             //Debug.Log(this.gameObject + " scent changed to " + animalScent.scent);
         }
@@ -205,7 +219,7 @@ public class Scent : MonoBehaviour
     IEnumerator DecayCycleCoroutine()
     {
         decayCycleBusy = true;
-        yield return new WaitForSeconds(decayWaitTime);
+        yield return new WaitForSeconds(decayWaitTime + Random.Range(0.01f, 0.1f));
         decayCycleBusy = false;
     }
     IEnumerator AnnounceCycleCoroutine()

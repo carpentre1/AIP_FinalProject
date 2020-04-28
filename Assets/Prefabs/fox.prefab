@@ -175,6 +175,7 @@ MonoBehaviour:
   scent: 2
   scentStrength: 1
   scentRadius: 5
+  scentProvider: {fileID: 0}
   defaultScent: 2
   defaultScentStrength: 1
   isTurf: 0
@@ -209,7 +210,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aff460f24747e3841aef4ebbc14fc8a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sightRadius: 2
+  sightRadius: 1
   distractedModifier: 0.7
 --- !u!114 &2077646659644324351
 MonoBehaviour:
@@ -246,8 +247,10 @@ MonoBehaviour:
   thirst: 1
   alive: 1
   busyThinking: 0
+  detectedObjects: []
   objective: {fileID: 0}
   farBoundary: {fileID: 0}
+  smelledObjects: []
 --- !u!1001 &4997894860170475006
 PrefabInstance:
   m_ObjectHideFlags: 0

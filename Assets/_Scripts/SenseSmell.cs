@@ -42,5 +42,11 @@ public class SenseSmell : MonoBehaviour
             myBehavior.UpdateObjective(Behavior.Objective.Escaping, scent.gameObject);
             Debug.Log("fleeing due to smell");
         }
+        GetComponent<Behavior>().smelledObjects.Add(scent.gameObject);
+    }
+
+    public void ForgetSmell(Scent scent)
+    {
+        GetComponent<Behavior>().smelledObjects.Remove(scent.gameObject);
     }
 }

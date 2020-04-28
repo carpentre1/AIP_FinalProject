@@ -125,6 +125,7 @@ MonoBehaviour:
   scent: 3
   scentStrength: 1
   scentRadius: 5
+  scentProvider: {fileID: 0}
   defaultScent: 3
   defaultScentStrength: 1
   isTurf: 1

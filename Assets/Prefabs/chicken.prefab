@@ -173,10 +173,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scent: 0
-  scentStrength: 1
+  scentStrength: 2
   scentRadius: 5
+  scentProvider: {fileID: 0}
   defaultScent: 0
-  defaultScentStrength: 1
+  defaultScentStrength: 2
   isTurf: 0
   northNeighbor: {fileID: 0}
   southNeighbor: {fileID: 0}
@@ -246,8 +247,10 @@ MonoBehaviour:
   thirst: 1
   alive: 1
   busyThinking: 0
+  detectedObjects: []
   objective: {fileID: 0}
   farBoundary: {fileID: 0}
+  smelledObjects: []
 --- !u!1001 &6385185230191365375
 PrefabInstance:
   m_ObjectHideFlags: 0

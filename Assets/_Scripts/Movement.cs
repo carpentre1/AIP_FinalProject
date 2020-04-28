@@ -80,6 +80,30 @@ public class Movement : MonoBehaviour
             }
         }
 
+        if(behaviorScript.curObj == Behavior.Objective.Tracking && behaviorScript.objective)
+        {
+            if(Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .1f)
+            {
+                Debug.Log("travelling to scent");
+                transform.position = Vector2.MoveTowards(transform.position, behaviorScript.objective.transform.position, totalMoveSpeed * Time.deltaTime);
+            }
+            else
+            {
+                GameObject nextScent = behaviorScript.objective.GetComponent<Scent>().StrongestNeighbor();
+                if (nextScent)
+                {
+                    behaviorScript.UpdateObjective(Behavior.Objective.Tracking, nextScent);
+                    Debug.Log("establishing new stronger scent");
+                }
+                else
+                {
+                    Debug.Log("lost the trail?");
+                    behaviorScript.objective.GetComponent<Scent>().scentStrength = 0.9f;
+                    behaviorScript.busyThinking = false;
+                }
+            }
+        }
+
         if (behaviorScript.curObj == Behavior.Objective.SearchingFar && behaviorScript.objective)
         {
             if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > 1)
