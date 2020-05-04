@@ -50,6 +50,7 @@ public class Behavior : MonoBehaviour
     public GameObject objective;
     public GameObject farBoundary;
     public List<GameObject> smelledObjects = new List<GameObject>();
+    public List<GameObject> heardObjects = new List<GameObject>();
 
 
 
@@ -65,7 +66,7 @@ public class Behavior : MonoBehaviour
         thirst = Random.Range(.7f, 1f);
         if(isPredator)
         {
-            hunger = .4f;
+            hunger = .41f;
         }
     }
 
@@ -103,6 +104,7 @@ public class Behavior : MonoBehaviour
     public void Nibble(GameObject g)
     {
         timeUntilNextThought += Time.deltaTime;
+        MakeNoise(3);
         if (g.GetComponent<Behavior>())
         {
             Behavior behavior = g.GetComponent<Behavior>();
@@ -132,6 +134,30 @@ public class Behavior : MonoBehaviour
         {
             UpdateObjective(Objective.Wander);
         }
+    }
+
+    void MakeNoise(float noiseRadius)
+    {
+        List<GameObject> listeners = new List<GameObject>();
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(this.gameObject.transform.position, noiseRadius);
+        int i = 0;
+        while (i < hitColliders.Length)
+        {
+            if (hitColliders[i].gameObject.tag == "predator" || hitColliders[i].gameObject.tag == "chicken" || hitColliders[i].gameObject.tag == "bunny")
+            {
+                listeners.Add(hitColliders[i].gameObject);
+            }
+            i++;
+        }
+        foreach (GameObject g in listeners)
+        {
+            Behavior listenerBehavior = g.GetComponent<Behavior>();
+            if(!listenerBehavior.heardObjects.Contains(gameObject))
+            {
+                listenerBehavior.heardObjects.Add(gameObject);
+            }
+        }
+        
     }
 
     void SearchFar()
@@ -197,7 +223,7 @@ public class Behavior : MonoBehaviour
     {
         List<GameObject> seenObjects = sightScript.SeenObjects();
         detectedObjects = seenObjects;
-
+        detectedObjects.AddRange(heardObjects);
         //add hearing and smelling to the list of detected objects
 
     }
@@ -330,5 +356,11 @@ public class Behavior : MonoBehaviour
         GameManager.Instance.occupiedObjects.Add(obj);
 
         behaviorText.text = curObj.ToString();
+        if(heardObjects.Contains(objective))
+        {
+            behaviorText.text = curObj.ToString() + " (heard)";
+        }
+
+        heardObjects.Clear();
     }
 }
