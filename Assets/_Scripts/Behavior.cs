@@ -155,6 +155,7 @@ public class Behavior : MonoBehaviour
     }
     public void Drink()
     {
+        MakeNoise(3);
         bonusTimeUntilNextThought += Time.deltaTime;
         thirst = Mathf.Min(thirst + 1f * Time.deltaTime, 1);
 
@@ -179,6 +180,7 @@ public class Behavior : MonoBehaviour
         while (wetness > .1f && curObj == Objective.DryingOff)
         {
             yield return new WaitForSeconds(.1f);
+            MakeNoise(4);
             wetness = Mathf.Max(wetness - 4f * Time.deltaTime, 0);
             bonusTimeUntilNextThought += Time.deltaTime;
             if (!rotatedLeft)
@@ -186,7 +188,6 @@ public class Behavior : MonoBehaviour
                 //rotate left
                 ToggleFreezeRotation(false);
                 transform.Rotate(0, 0, 7);
-                Debug.Log("rotated left");
                 ToggleFreezeRotation(true);
                 rotatedLeft = true;
             }
@@ -196,7 +197,6 @@ public class Behavior : MonoBehaviour
                 ToggleFreezeRotation(false);
                 transform.Rotate(0, 0, -7);
                 ToggleFreezeRotation(true);
-                Debug.Log("rotated right");
                 rotatedLeft = false;
             }
         }
@@ -234,7 +234,7 @@ public class Behavior : MonoBehaviour
         else return false;
     }
 
-    void CancelObjective()
+    public void CancelObjective()
     {
         timeUntilNextThought = 0f;
         bonusTimeUntilNextThought = 0f;

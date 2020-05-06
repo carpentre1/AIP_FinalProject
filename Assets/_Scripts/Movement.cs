@@ -8,9 +8,9 @@ public class Movement : MonoBehaviour
 
     public float movementSpeed = 1.0f;//how fast the animal moves by default
     public float walkMultiplier = 1.0f;
-    public float waterMultiplier = .5f;
+    public float waterMultiplier = .7f;
     public float sprintMultiplier = 2.0f;
-    public float wanderMultiplier = .5f;
+    public float wanderMultiplier = .7f;
     bool isSprinting = false;
     public int inWater = 0;//any value over 0 is in water
     float totalMoveSpeed = 1.0f;
@@ -159,14 +159,14 @@ public class Movement : MonoBehaviour
 
         if (behaviorScript.curObj == Behavior.Objective.Escaping)
         {
-            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) < 3f)
+            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) < 4f)
             {
                 Vector2 fleeDirection = transform.position - behaviorScript.objective.transform.position;
                 transform.Translate(fleeDirection * Time.deltaTime * totalMoveSpeed);
             }
             else
             {
-                //
+                behaviorScript.CancelObjective();
             }
         }
 

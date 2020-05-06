@@ -205,6 +205,8 @@ public class Scent : MonoBehaviour
             scent = animalScent.scent;
             scentProvider = animalScent.gameObject;
             scentStrength = animalScent.scentStrength;
+            float dist = Vector2.Distance(this.gameObject.transform.position, animalScent.gameObject.transform.position);
+            scentStrength -= dist;
             //Debug.Log(this.gameObject + " scent changed to " + animalScent.scent);
         }
         else
