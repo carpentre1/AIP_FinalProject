@@ -44,4 +44,21 @@ public class SenseSight : MonoBehaviour
         //Debug.Log("seen by " + gameObject + ": " + s);
         return seenObjects;
     }
+
+    public List<GameObject> SeenGroundObjects()
+    {
+        List<GameObject> seenObjects = new List<GameObject>();
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(this.gameObject.transform.position, sightRadius);
+        int i = 0;
+        while (i < hitColliders.Length)
+        {
+            //only see objects that are relevant to gameplay
+            if (hitColliders[i].gameObject.tag == "grass")
+            {
+                seenObjects.Add(hitColliders[i].gameObject);
+            }
+            i++;
+        }
+        return seenObjects;
+    }
 }

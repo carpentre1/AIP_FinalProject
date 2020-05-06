@@ -241,16 +241,19 @@ MonoBehaviour:
   isPredator: 1
   isPrey: 0
   behaviorText: {fileID: 7244518426915853534}
+  thoughtTimer: {fileID: 8337716925705275487}
   sliderHunger: {fileID: 2972451346151949334}
   sliderThirst: {fileID: 7624701417282274568}
   hunger: 1
   thirst: 1
   alive: 1
   busyThinking: 0
+  isResting: 0
   detectedObjects: []
   objective: {fileID: 0}
   farBoundary: {fileID: 0}
   smelledObjects: []
+  heardObjects: []
 --- !u!1001 &4997894860170475006
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -416,6 +419,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 4997894860170475006}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8337716925705275487 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3956856180589657505, guid: 854431a6285e59b48b8233b606a01f09,
+    type: 3}
+  m_PrefabInstance: {fileID: 4997894860170475006}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &7244518426915853534 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2438037040833585440, guid: 854431a6285e59b48b8233b606a01f09,

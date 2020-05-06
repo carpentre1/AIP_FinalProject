@@ -14,7 +14,7 @@ public class Behavior : MonoBehaviour
     //States: wandering, chasing prey, moving to water, returning to remembered chicken area
 
     //higher number objectives are more important
-    public enum Objective { Wander = 0, FollowingScent = 1, Stalking = 2, Chasing = 3, Eating = 4, Drinking = 5, Escaping = 6, SearchingFar = 7, Tracking=8 }
+    public enum Objective { Wander = 0, FollowingScent = 1, Stalking = 2, Chasing = 3, Eating = 4, Drinking = 5, Escaping = 6, SearchingFar = 7, Tracking=8, Resting=9, DryingOff=10 }
     public Objective curObj = Objective.Wander;
 
     public enum Animal { Chicken, Fox, Bunny}
@@ -30,6 +30,7 @@ public class Behavior : MonoBehaviour
     SenseHearing hearingScript;
 
     public TextMeshProUGUI behaviorText;
+    public TextMeshProUGUI thoughtTimer;
     public Slider sliderHunger;
     public Slider sliderThirst;
 
@@ -38,12 +39,20 @@ public class Behavior : MonoBehaviour
     public float thirst = .7f;
     public bool alive = true;
 
+    public float wetness = 0;
+    bool rotatedLeft = false;
+    bool tryingToDry = false;
+
     //how much food an object has on it
     float foodValue = 1;
 
     const float DEFAULT_TIME_UNTIL_NEXT_THOUGHT = 1f;
-    float timeUntilNextThought = 1f;
+    float timeUntilNextThought = .5f;
+    [HideInInspector]
+    public float bonusTimeUntilNextThought = 0f;
     public bool busyThinking = false;
+
+    public bool isResting = false;
 
     [HideInInspector]
     public List<GameObject> detectedObjects = new List<GameObject>();
@@ -66,7 +75,7 @@ public class Behavior : MonoBehaviour
         thirst = Random.Range(.7f, 1f);
         if(isPredator)
         {
-            hunger = .41f;
+            //hunger = .41f;
         }
     }
 
@@ -85,15 +94,34 @@ public class Behavior : MonoBehaviour
 
             SearchFar();
         }
-        //if nothing productive to do was found, wander
+        //if nothing productive to do was found, do a 'lazy objective'
         if(!busyThinking)
         {
-            UpdateObjective(Objective.Wander);
+            int randomObjective = Random.Range(0, 10);
+            if (randomObjective > 8 && !IsInWater())
+            {
+                UpdateObjective(Objective.Resting);
+            }
+            else if(wetness >= .5f)
+            {
+                UpdateObjective(Objective.DryingOff);
+            }
+            else
+            {
+                UpdateObjective(Objective.Wander);
+
+            }
+        }
+
+        if(IsInWater())
+        {
+            wetness = Mathf.Min(wetness + .15f * Time.deltaTime, 1);
         }
 
         hunger = Mathf.Max(hunger - .01f * Time.deltaTime, 0);
         sliderHunger.value = hunger;
         thirst = Mathf.Max(thirst - .02f * Time.deltaTime, 0);
+        wetness = Mathf.Max(wetness - .02f * Time.deltaTime, 0);
         sliderThirst.value = thirst;
         if(hunger <= 0 || thirst <= 0)
         {
@@ -103,7 +131,7 @@ public class Behavior : MonoBehaviour
 
     public void Nibble(GameObject g)
     {
-        timeUntilNextThought += Time.deltaTime;
+        bonusTimeUntilNextThought += Time.deltaTime;
         MakeNoise(3);
         if (g.GetComponent<Behavior>())
         {
@@ -127,13 +155,89 @@ public class Behavior : MonoBehaviour
     }
     public void Drink()
     {
-        timeUntilNextThought += Time.deltaTime;
+        bonusTimeUntilNextThought += Time.deltaTime;
         thirst = Mathf.Min(thirst + 1f * Time.deltaTime, 1);
 
         if (thirst >= .95f)
         {
             UpdateObjective(Objective.Wander);
         }
+    }
+
+    public void DryOff()
+    {
+        if(!tryingToDry)
+        {
+            StartCoroutine(DryingOffCoroutine());
+        }
+    }
+
+    IEnumerator DryingOffCoroutine()
+    {
+        tryingToDry = true;
+        Quaternion origRot = transform.rotation;
+        while (wetness > .1f && curObj == Objective.DryingOff)
+        {
+            yield return new WaitForSeconds(.1f);
+            wetness = Mathf.Max(wetness - 4f * Time.deltaTime, 0);
+            bonusTimeUntilNextThought += Time.deltaTime;
+            if (!rotatedLeft)
+            {
+                //rotate left
+                ToggleFreezeRotation(false);
+                transform.Rotate(0, 0, 7);
+                Debug.Log("rotated left");
+                ToggleFreezeRotation(true);
+                rotatedLeft = true;
+            }
+            else
+            {
+                //rotate right
+                ToggleFreezeRotation(false);
+                transform.Rotate(0, 0, -7);
+                ToggleFreezeRotation(true);
+                Debug.Log("rotated right");
+                rotatedLeft = false;
+            }
+        }
+        tryingToDry = false;
+        transform.rotation = origRot;
+        if(curObj == Objective.DryingOff)
+        {
+            CancelObjective();
+        }
+    }
+
+    void ToggleFreezeRotation(bool enabled)
+    {
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if(enabled)
+        {
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
+        else
+        {
+            rb.constraints = RigidbodyConstraints2D.None;
+
+        }
+    }
+
+    void Rest()
+    {
+        float restDuration = 3f;
+        bonusTimeUntilNextThought += restDuration;
+    }
+
+    bool IsInWater()
+    {
+        if (GetComponent<Movement>().inWater > 0) return true;
+        else return false;
+    }
+
+    void CancelObjective()
+    {
+        timeUntilNextThought = 0f;
+        bonusTimeUntilNextThought = 0f;
     }
 
     void MakeNoise(float noiseRadius)
@@ -221,23 +325,34 @@ public class Behavior : MonoBehaviour
 
     void UseAllSenses()
     {
-        List<GameObject> seenObjects = sightScript.SeenObjects();
-        detectedObjects = seenObjects;
+        if(!isResting)
+        {
+            List<GameObject> seenObjects = sightScript.SeenObjects();
+            detectedObjects = seenObjects;
+        }
         detectedObjects.AddRange(heardObjects);
-        //add hearing and smelling to the list of detected objects
 
     }
 
     IEnumerator ThoughtCoroutine()
     {
+        float timeElapsed = 0f;
         busyThinking = true;
         timeUntilNextThought = DEFAULT_TIME_UNTIL_NEXT_THOUGHT;
-        yield return new WaitForSeconds(timeUntilNextThought);
+        while(timeElapsed < timeUntilNextThought + bonusTimeUntilNextThought)
+        {
+            timeElapsed += Time.deltaTime;
+            //thoughtTimer.text = ((timeUntilNextThought + bonusTimeUntilNextThought) - timeElapsed).ToString("#.#");
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
         busyThinking = false;
         if (GameManager.Instance.occupiedObjects.Contains(objective))
         {
             GameManager.Instance.occupiedObjects.Remove(objective);
         }
+
+        bonusTimeUntilNextThought = 0f;
+        yield return null;
     }
 
     public void Die(bool removeCorpse)
@@ -257,6 +372,7 @@ public class Behavior : MonoBehaviour
 
         foreach (GameObject g in detectedObjects)
         {
+            if (!g) continue;
             if (g.tag == "predator" && isPrey)
             {
                 UpdateObjective(Objective.Escaping, g);
@@ -304,7 +420,6 @@ public class Behavior : MonoBehaviour
             if(scent.scentStrength < 1) { continue; }
             if((scent.scentProvider.tag == "chicken" || scent.scentProvider.tag == "bunny") && isPredator)
             {
-                Debug.Log("found a scent to track");
                 UpdateObjective(Objective.Tracking, g);
             }
         }
@@ -345,7 +460,13 @@ public class Behavior : MonoBehaviour
     {
         curObj = newObj;
         objective = obj;
-        StopAllCoroutines();
+        StopCoroutine(ThoughtCoroutine());
+
+        if(curObj == Objective.Resting)
+        {
+            Rest();
+        }
+
         StartCoroutine(ThoughtCoroutine());
 
         //update the list of occupied objects

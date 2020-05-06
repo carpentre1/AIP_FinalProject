@@ -21,6 +21,7 @@ public class Water : MonoBehaviour
         if (other.GetComponent<Movement>())
         {
             other.GetComponent<Movement>().inWater++;
+            other.GetComponent<Movement>().waterEntered = this.gameObject;
         }
         if(other.GetComponent<Scent>())
         {

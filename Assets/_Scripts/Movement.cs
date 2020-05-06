@@ -18,6 +18,9 @@ public class Movement : MonoBehaviour
     public float eatRange = .04f;
     public float drinkRange = .05f;
 
+    [HideInInspector]
+    public GameObject waterEntered;
+
     const float MOVEMENT_NORMALIZATION = 1f;//adjusts the overall speed of movement to accomodate the size of objects relative to the world
 
     bool isPlayerControlled = false;
@@ -84,7 +87,6 @@ public class Movement : MonoBehaviour
         {
             if(Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .1f)
             {
-                Debug.Log("travelling to scent");
                 transform.position = Vector2.MoveTowards(transform.position, behaviorScript.objective.transform.position, totalMoveSpeed * Time.deltaTime);
             }
             else
@@ -93,11 +95,9 @@ public class Movement : MonoBehaviour
                 if (nextScent)
                 {
                     behaviorScript.UpdateObjective(Behavior.Objective.Tracking, nextScent);
-                    Debug.Log("establishing new stronger scent");
                 }
                 else
                 {
-                    Debug.Log("lost the trail?");
                     behaviorScript.objective.GetComponent<Scent>().scentStrength = 0.9f;
                     behaviorScript.busyThinking = false;
                 }
@@ -113,6 +113,22 @@ public class Movement : MonoBehaviour
             else
             {
                 behaviorScript.farBoundary = null;
+            }
+        }
+
+        if (behaviorScript.curObj == Behavior.Objective.DryingOff)
+        {
+            if(inWater > 0)
+            {
+                //go to dry land
+                behaviorScript.bonusTimeUntilNextThought += Time.deltaTime;
+                if(!behaviorScript.objective) behaviorScript.objective = waterEntered;
+                Vector2 fleeDirection = transform.position - behaviorScript.objective.transform.position;
+                transform.Translate(fleeDirection * Time.deltaTime * totalMoveSpeed);
+            }
+            else
+            {
+                behaviorScript.DryOff();
             }
         }
 

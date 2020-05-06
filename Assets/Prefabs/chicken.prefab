@@ -241,16 +241,19 @@ MonoBehaviour:
   isPredator: 0
   isPrey: 1
   behaviorText: {fileID: 8739545034073959903}
+  thoughtTimer: {fileID: 7959320253341266270}
   sliderHunger: {fileID: 3783285404784033047}
   sliderThirst: {fileID: 8363408041413032969}
   hunger: 1
   thirst: 1
   alive: 1
   busyThinking: 0
+  isResting: 0
   detectedObjects: []
   objective: {fileID: 0}
   farBoundary: {fileID: 0}
   smelledObjects: []
+  heardObjects: []
 --- !u!1001 &6385185230191365375
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -368,6 +371,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 8910738073655925143, guid: 854431a6285e59b48b8233b606a01f09,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 854431a6285e59b48b8233b606a01f09, type: 3}
 --- !u!224 &4923837945419392328 stripped
@@ -376,6 +384,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 6385185230191365375}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7959320253341266270 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3956856180589657505, guid: 854431a6285e59b48b8233b606a01f09,
+    type: 3}
+  m_PrefabInstance: {fileID: 6385185230191365375}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8739545034073959903 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2438037040833585440, guid: 854431a6285e59b48b8233b606a01f09,
