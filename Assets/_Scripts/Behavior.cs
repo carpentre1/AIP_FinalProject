@@ -14,7 +14,7 @@ public class Behavior : MonoBehaviour
     //States: wandering, chasing prey, moving to water, returning to remembered chicken area
 
     //higher number objectives are more important
-    public enum Objective { Wander = 0, FollowingScent = 1, Stalking = 2, Chasing = 3, Eating = 4, Drinking = 5, Escaping = 6, SearchingFar = 7, Tracking=8, Resting=9, DryingOff=10 }
+    public enum Objective { Wander = 0, FollowingScent = 1, Stalking = 2, Chasing = 3, Eating = 4, Drinking = 5, Escaping = 6, SearchingFar = 7, Tracking=8, Resting=9, DryingOff=10, Flocking=11 }
     public Objective curObj = Objective.Wander;
 
     public enum Animal { Chicken, Fox, Bunny}
@@ -42,6 +42,10 @@ public class Behavior : MonoBehaviour
     public float wetness = 0;
     bool rotatedLeft = false;
     bool tryingToDry = false;
+
+    //0 is leader, 1 follows 0, 2 follows 1
+    public int flockNumber;
+    public GameObject flockTarget;
 
     //how much food an object has on it
     float foodValue = 1;
@@ -98,13 +102,17 @@ public class Behavior : MonoBehaviour
         if(!busyThinking)
         {
             int randomObjective = Random.Range(0, 10);
-            if (randomObjective > 8 && !IsInWater())
+            if (randomObjective > 9 && !IsInWater())
             {
                 UpdateObjective(Objective.Resting);
             }
             else if(wetness >= .5f)
             {
                 UpdateObjective(Objective.DryingOff);
+            }
+            else if(flockTarget)
+            {
+                UpdateObjective(Objective.Flocking, flockTarget);
             }
             else
             {
@@ -118,9 +126,9 @@ public class Behavior : MonoBehaviour
             wetness = Mathf.Min(wetness + .15f * Time.deltaTime, 1);
         }
 
-        hunger = Mathf.Max(hunger - .01f * Time.deltaTime, 0);
+        hunger = Mathf.Max(hunger - .008f * Time.deltaTime, 0);
         sliderHunger.value = hunger;
-        thirst = Mathf.Max(thirst - .02f * Time.deltaTime, 0);
+        thirst = Mathf.Max(thirst - .008f * Time.deltaTime, 0);
         wetness = Mathf.Max(wetness - .02f * Time.deltaTime, 0);
         sliderThirst.value = thirst;
         if(hunger <= 0 || thirst <= 0)
@@ -173,6 +181,43 @@ public class Behavior : MonoBehaviour
         }
     }
 
+    void AssignFlock()
+    {
+        int difference = 0;
+        GameObject bestFlockTarget = null;
+        if (gameObject.tag == "chicken")
+        {
+            foreach (GameObject g in detectedObjects)
+            {
+                if(!GetComponent<Behavior>())
+                {
+                    continue;
+                }
+                Behavior b = g.GetComponent<Behavior>();
+                if(g.tag == "chicken")
+                {
+                    if (flockNumber > b.flockNumber)
+                    {
+                        flockTarget = g;
+                        if(difference == 0)
+                        {
+                            difference = flockNumber - b.flockNumber;
+                        }
+                        int currentDifference = flockNumber - b.flockNumber;
+                        if(currentDifference <= difference)
+                        {
+                            bestFlockTarget = g;
+                        }
+                    }
+                }
+            }
+            if(bestFlockTarget)
+            {
+                flockTarget = bestFlockTarget;
+            }
+        }
+    }
+
     IEnumerator DryingOffCoroutine()
     {
         tryingToDry = true;
@@ -180,7 +225,7 @@ public class Behavior : MonoBehaviour
         while (wetness > .1f && curObj == Objective.DryingOff)
         {
             yield return new WaitForSeconds(.1f);
-            MakeNoise(4);
+            MakeNoise(2.5f);
             wetness = Mathf.Max(wetness - 4f * Time.deltaTime, 0);
             bonusTimeUntilNextThought += Time.deltaTime;
             if (!rotatedLeft)
@@ -332,6 +377,8 @@ public class Behavior : MonoBehaviour
         }
         detectedObjects.AddRange(heardObjects);
 
+        AssignFlock();
+
     }
 
     IEnumerator ThoughtCoroutine()
@@ -385,7 +432,7 @@ public class Behavior : MonoBehaviour
     {
         if (busyThinking) return;
 
-        if(hunger > .7f)
+        if(hunger > .5f)
         {
             return;
         }
@@ -429,7 +476,7 @@ public class Behavior : MonoBehaviour
     {
         if (busyThinking) return;
 
-        if(thirst > .7f)
+        if(thirst > .5f)
         {
             return;
         }

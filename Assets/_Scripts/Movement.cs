@@ -83,7 +83,19 @@ public class Movement : MonoBehaviour
             }
         }
 
-        if(behaviorScript.curObj == Behavior.Objective.Tracking && behaviorScript.objective)
+        if (behaviorScript.curObj == Behavior.Objective.Flocking && behaviorScript.objective)
+        {
+            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .5f)
+            {
+                transform.position = Vector2.MoveTowards(transform.position, behaviorScript.objective.transform.position, totalMoveSpeed * Time.deltaTime);
+            }
+            else
+            {
+                //not sure what to do while close
+            }
+        }
+
+        if (behaviorScript.curObj == Behavior.Objective.Tracking && behaviorScript.objective)
         {
             if(Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .1f)
             {
@@ -162,7 +174,7 @@ public class Movement : MonoBehaviour
             if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) < 4f)
             {
                 Vector2 fleeDirection = transform.position - behaviorScript.objective.transform.position;
-                transform.Translate(fleeDirection * Time.deltaTime * totalMoveSpeed);
+                transform.Translate(fleeDirection * Time.deltaTime * totalMoveSpeed / 6);
             }
             else
             {
