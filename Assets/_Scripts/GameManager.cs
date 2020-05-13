@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
 
     public enum AnimalType {None, Bunny, Chicken, Fox};
 
+    public List<GameObject> waypoints = new List<GameObject>();
+
     //prevent animals from picking/crowding around the same bush or water
     public List<GameObject> occupiedObjects = new List<GameObject>();
 }

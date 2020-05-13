@@ -79,7 +79,7 @@ public class Behavior : MonoBehaviour
         thirst = Random.Range(.7f, 1f);
         if(isPredator)
         {
-            //hunger = .41f;
+            hunger = .45f;
         }
     }
 
@@ -126,9 +126,9 @@ public class Behavior : MonoBehaviour
             wetness = Mathf.Min(wetness + .15f * Time.deltaTime, 1);
         }
 
-        hunger = Mathf.Max(hunger - .008f * Time.deltaTime, 0);
+        hunger = Mathf.Max(hunger - .009f * Time.deltaTime, 0);
         sliderHunger.value = hunger;
-        thirst = Mathf.Max(thirst - .008f * Time.deltaTime, 0);
+        thirst = Mathf.Max(thirst - .009f * Time.deltaTime, 0);
         wetness = Mathf.Max(wetness - .02f * Time.deltaTime, 0);
         sliderThirst.value = thirst;
         if(hunger <= 0 || thirst <= 0)
@@ -189,6 +189,7 @@ public class Behavior : MonoBehaviour
         {
             foreach (GameObject g in detectedObjects)
             {
+                if (!g) continue;
                 if(!GetComponent<Behavior>())
                 {
                     continue;

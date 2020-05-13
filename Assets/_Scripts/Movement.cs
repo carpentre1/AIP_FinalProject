@@ -65,10 +65,21 @@ public class Movement : MonoBehaviour
         }
         if (behaviorScript.curObj == Behavior.Objective.Wander)
         {
-            //rb.AddForce(wanderDirection * Time.deltaTime * movementSpeed * totalMoveSpeed * wanderMultiplier);
-            transform.Translate((wanderDirection * Time.deltaTime * movementSpeed * totalMoveSpeed * wanderMultiplier));
-            wanderTime -= Time.deltaTime;
-            if(wanderTime <= 0) { isWandering = false; }
+            if(!behaviorScript.objective)
+            {
+                behaviorScript.objective = GameManager.Instance.waypoints[Random.Range(0, GameManager.Instance.waypoints.Count)];
+            }
+            //transform.Translate((wanderDirection * Time.deltaTime * movementSpeed * totalMoveSpeed * wanderMultiplier));
+            //wanderTime -= Time.deltaTime;
+            //if(wanderTime <= 0) { isWandering = false; }
+            if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) > .5f)
+            {
+                transform.position = Vector2.MoveTowards(transform.position, behaviorScript.objective.transform.position, totalMoveSpeed * wanderMultiplier * Time.deltaTime);
+            }
+            else
+            {
+                behaviorScript.CancelObjective();
+            }
         }
 
         if(behaviorScript.curObj == Behavior.Objective.Eating && behaviorScript.objective)
@@ -174,7 +185,7 @@ public class Movement : MonoBehaviour
             if (Vector2.Distance(this.gameObject.transform.position, behaviorScript.objective.transform.position) < 4f)
             {
                 Vector2 fleeDirection = transform.position - behaviorScript.objective.transform.position;
-                transform.Translate(fleeDirection * Time.deltaTime * totalMoveSpeed / 6);
+                transform.Translate(fleeDirection * Time.deltaTime * totalMoveSpeed / 2);
             }
             else
             {
